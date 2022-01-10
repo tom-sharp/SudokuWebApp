@@ -1,0 +1,15 @@
+﻿@*
+	View for a solved puzzle
+*@
+
+@model SudokuPuzzleModel
+
+<div class="text-center">
+	<p id="sudokuPuzzle">@Model.SudokuString</p>
+
+	<canvas id="sudokuBoard" width="400" height="400" style="border:3px solid #d3d3d3;">
+		Your browser does not support the HTML5 canvas tag.
+	</canvas>
+
+
+</div>
