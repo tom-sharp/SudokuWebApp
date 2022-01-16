@@ -6,31 +6,43 @@ using System.Threading.Tasks;
 
 using SudokuWebApp.Models;
 using Sudoku.Puzzle;
+using Sudoku.DataStore;
 
 namespace SudokuWebApp.Controllers
 {
 	public class SudokuController : Controller
 	{
-		public IActionResult Index()
-		{
+		public SudokuController(ISudokuDb dbctx) {
+			this.db = dbctx;
+		}
+
+		public IActionResult Index() {
 			return View();
 		}
 
-		public IActionResult NewPuzzle()
-		{
+		public async Task<IActionResult> NewPuzzle() {
 			var puzzle = new CreateSudoku().GetSudokuPuzzle();
-			var model = new SudokuPuzzleModel() { PuzzleString = puzzle.GetPuzzle(), SudokuString = "" };
-//			puzzle.ResolveNumPass();
-//			model.SudokuString = puzzle.GetPuzzle();
+			var model = new SudokuPuzzleModel(puzzle);
+			if (await this.db.AddAsync(puzzle.GetPuzzle())) await this.db.SaveChangesAsync();
+			return View("Puzzle",model);
+		}
+
+		public async Task<IActionResult> Puzzle(int difficultycategory) {
+			if ((difficultycategory < 1) || (difficultycategory > 5)) {
+				return RedirectToAction("NewPuzzle");
+			}
+			var puzzle = await this.db.GetRandomPuzzleAsync(difficultycategory);
+			if (puzzle == null) return RedirectToAction("NewPuzzle");
+			var model = new SudokuPuzzleModel(puzzle);
 			return View(model);
 		}
 
 
 		public IActionResult PuzzleSolver(string SolvePuzzle) {
 			var puzzle = new SudokuPuzzle(SolvePuzzle);
-			var model = new SudokuPuzzleModel() { PuzzleString = puzzle.GetPuzzle(), SudokuString = "" };
-			if (puzzle.ResolveNumPass()) model.SudokuString = puzzle.GetPuzzle();
-			else model.SudokuString = "Bad puzzle";
+			var model = new SudokuPuzzleModel(puzzle);
+			if (puzzle.ResolveNumPass()) model.PuzzleSolved = puzzle.GetPuzzle();
+			else model.PuzzleSolved = "Bad puzzle";
 			return View(model);
 		}
 
@@ -41,6 +53,8 @@ namespace SudokuWebApp.Controllers
 			return View();
 		}
 
+
+		ISudokuDb db = null;
 
 	}
 }

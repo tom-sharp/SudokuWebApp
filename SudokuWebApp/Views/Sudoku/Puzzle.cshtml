@@ -1,18 +1,18 @@
 ﻿@*
-	View for a new puzzle
+	View for a puzzle
 *@
 
 @model SudokuPuzzleModel
 
 <div class="text-center">
-	<p id="sudokuPuzzle">@Model.PuzzleString</p>
+	<p id="sudokuPuzzle">@Model.Puzzle</p>
 
 	<canvas id="sudokuBoard" width="400" height="400" style="border:3px solid #d3d3d3;">
 		Your browser does not support the HTML5 canvas tag.
 	</canvas>
 
 	<form method="post">
-		<input type="submit" value="Solve Puzzle" asp-controller="Sudoku" asp-action="PuzzleSolver" asp-route-SolvePuzzle="@Model.PuzzleString" />
+		<input type="submit" value="Solve Puzzle" asp-controller="Sudoku" asp-action="PuzzleSolver" asp-route-SolvePuzzle="@Model.Puzzle" />
 	</form>
 
 
